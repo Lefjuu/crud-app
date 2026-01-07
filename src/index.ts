@@ -1,9 +1,12 @@
 import express, { Application, Request, Response } from 'express';
 import swaggerUi from 'swagger-ui-express';
 import swaggerJsdoc from 'swagger-jsdoc';
+import morgan from 'morgan';
+import rateLimit from 'express-rate-limit';
 import { prisma } from './lib/prisma';
 import userRoutes from './routes/user.routes';
 import addressRoutes from './routes/address.routes';
+import authRoutes from './routes/auth.routes';
 
 const app: Application = express();
 const PORT = process.env.PORT || 3000;
@@ -11,6 +14,22 @@ const PORT = process.env.PORT || 3000;
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Logging middleware
+app.use(morgan('combined'));
+
+// Rate limiting middleware - 100 requests per minute per IP
+const limiter = rateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minute
+  max: 100, // limit each IP to 100 requests per windowMs
+  message: {
+    success: false,
+    message: 'Too many requests from this IP, please try again later.'
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+app.use('/api/', limiter);
 
 // Swagger configuration
 const swaggerOptions = {
@@ -38,6 +57,24 @@ const swaggerOptions = {
       {
         name: 'Addresses',
         description: 'Address management endpoints'
+      },
+      {
+        name: 'Authentication',
+        description: 'Authentication endpoints'
+      }
+    ],
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT'
+        }
+      }
+    },
+    security: [
+      {
+        bearerAuth: []
       }
     ]
   },
@@ -61,6 +98,17 @@ app.get('/', (req: Request, res: Response) => {
 
 app.use('/api/users', userRoutes);
 app.use('/api/addresses', addressRoutes);
+app.use('/api/auth', authRoutes);
+
+// Health check endpoint
+app.get('/api/health', (req: Request, res: Response) => {
+  res.status(200).json({
+    success: true,
+    message: 'API is healthy',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime()
+  });
+});
 
 // 404 handler
 app.use((req: Request, res: Response) => {

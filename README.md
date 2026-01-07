@@ -19,6 +19,9 @@ A RESTful API for user management built with Express.js, TypeScript, Prisma, and
 - ✅ Comprehensive testing (Jest + Supertest)
 - ✅ Automatic API documentation (Swagger/OpenAPI)
 - ✅ Input validation and error handling
+- ✅ Docker containerization support
+- ✅ Rate limiting and request logging middleware
+- ✅ Health check endpoint
 
 ## 🛠 Tech Stack
 
@@ -68,7 +71,39 @@ The API will be available at `http://localhost:3000`
 
 Once the server is running, visit `http://localhost:3000/api-docs` for interactive API documentation powered by Swagger.
 
-## 📋 API Endpoints
+## � Docker Support
+
+### Running with Docker Compose
+
+1. **Build and run the application:**
+
+```bash
+docker-compose up --build
+```
+
+The API will be available at `http://localhost:3000`
+
+2. **Run in background:**
+
+```bash
+docker-compose up -d --build
+```
+
+3. **Stop the containers:**
+
+```bash
+docker-compose down
+```
+
+### Docker Environment
+
+- **Application**: Node.js 18 Alpine container
+- **Database**: PostgreSQL 15 Alpine (for production-like setup)
+- **Health Check**: Available at `/api/health`
+- **Rate Limiting**: 100 requests per 15 minutes per IP
+- **Logging**: Morgan middleware for request logging
+
+## �📋 API Endpoints
 
 | Method | Endpoint                      | Description              |
 | ------ | ----------------------------- | ------------------------ |

@@ -20,7 +20,7 @@ describe('AddressService', () => {
   describe('createAddress', () => {
     it('should create a new address', async () => {
       const user = await prisma.user.create({
-        data: { name: 'Test User', email: 'test@example.com' }
+        data: { name: 'Test User', email: 'test@example.com', password: 'password123' }
       });
 
       const addressData = {
@@ -55,7 +55,7 @@ describe('AddressService', () => {
   describe('getAllAddresses', () => {
     it('should return all addresses', async () => {
       const user = await prisma.user.create({
-        data: { name: 'Test User', email: 'test@example.com' }
+        data: { name: 'Test User', email: 'test@example.com', password: 'password123' }
       });
 
       await addressService.createAddress({
@@ -90,7 +90,7 @@ describe('AddressService', () => {
   describe('getAddressById', () => {
     it('should return address by id', async () => {
       const user = await prisma.user.create({
-        data: { name: 'Test User', email: 'test@example.com' }
+        data: { name: 'Test User', email: 'test@example.com', password: 'password123' }
       });
 
       const address = await addressService.createAddress({
@@ -117,11 +117,11 @@ describe('AddressService', () => {
   describe('getAddressesByUserId', () => {
     it('should return addresses for user', async () => {
       const user1 = await prisma.user.create({
-        data: { name: 'User 1', email: 'user1@example.com' }
+        data: { name: 'User 1', email: 'user1@example.com', password: 'pass1' }
       });
 
       const user2 = await prisma.user.create({
-        data: { name: 'User 2', email: 'user2@example.com' }
+        data: { name: 'User 2', email: 'user2@example.com', password: 'pass2' }
       });
 
       await addressService.createAddress({
@@ -158,7 +158,7 @@ describe('AddressService', () => {
   describe('updateAddress', () => {
     it('should update address', async () => {
       const user = await prisma.user.create({
-        data: { name: 'Test User', email: 'test@example.com' }
+        data: { name: 'Test User', email: 'test@example.com', password: 'password123' }
       });
 
       const address = await addressService.createAddress({
@@ -191,7 +191,7 @@ describe('AddressService', () => {
   describe('deleteAddress', () => {
     it('should delete address', async () => {
       const user = await prisma.user.create({
-        data: { name: 'Test User', email: 'test@example.com' }
+        data: { name: 'Test User', email: 'test@example.com', password: 'password123' }
       });
 
       const address = await addressService.createAddress({

@@ -19,9 +19,34 @@ beforeEach(async () => {
   await prisma.user.deleteMany();
 });
 
+// Helper function to get auth token
+const getAuthToken = async () => {
+  const testUser = {
+    name: 'Test User',
+    email: 'test@example.com',
+    password: 'password123'
+  };
+
+  // Register user
+  await request(app)
+    .post('/api/auth/register')
+    .send(testUser);
+
+  // Login and get token
+  const loginResponse = await request(app)
+    .post('/api/auth/login')
+    .send({
+      email: testUser.email,
+      password: testUser.password
+    });
+
+  return loginResponse.body.data.token;
+};
+
 describe('User API Endpoints', () => {
   describe('POST /api/users', () => {
     it('should create a new user', async () => {
+      const token = await getAuthToken();
       const newUser = {
         name: 'Jan Kowalski',
         email: 'jan.kowalski@example.com',
@@ -30,6 +55,7 @@ describe('User API Endpoints', () => {
 
       const response = await request(app)
         .post('/api/users')
+        .set('Authorization', `Bearer ${token}`)
         .send(newUser)
         .expect(201);
 
@@ -42,12 +68,14 @@ describe('User API Endpoints', () => {
     });
 
     it('should return 400 if name is missing', async () => {
+      const token = await getAuthToken();
       const invalidUser = {
         email: 'test@example.com'
       };
 
       const response = await request(app)
         .post('/api/users')
+        .set('Authorization', `Bearer ${token}`)
         .send(invalidUser)
         .expect(400);
 

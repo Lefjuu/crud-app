@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { AddressController } from '../controllers/address.controller';
+import { authenticateToken } from '../middleware/auth.middleware';
 
 const router = Router();
 const addressController = new AddressController();

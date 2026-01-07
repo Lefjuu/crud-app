@@ -21,7 +21,7 @@ describe('Address API Endpoints', () => {
   describe('POST /api/addresses', () => {
     it('should create a new address', async () => {
       const user = await prisma.user.create({
-        data: { name: 'John Doe', email: 'john@example.com', age: 30 }
+        data: { name: 'John Doe', email: 'john@example.com', password: 'password123', age: 30 }
       });
 
       const newAddress = {
@@ -92,7 +92,7 @@ describe('Address API Endpoints', () => {
 
     it('should return all addresses with user data', async () => {
       const user = await prisma.user.create({
-        data: { name: 'John Doe', email: 'john@example.com', age: 30 }
+        data: { name: 'John Doe', email: 'john@example.com', password: 'password123', age: 30 }
       });
 
       await request(app).post('/api/addresses').send({
@@ -126,7 +126,7 @@ describe('Address API Endpoints', () => {
   describe('GET /api/addresses/:id', () => {
     it('should return an address by id', async () => {
       const user = await prisma.user.create({
-        data: { name: 'John Doe', email: 'john@example.com', age: 30 }
+        data: { name: 'John Doe', email: 'john@example.com', password: 'password123', age: 30 }
       });
 
       const createResponse = await request(app)
@@ -173,11 +173,11 @@ describe('Address API Endpoints', () => {
   describe('GET /api/addresses/user/:userId', () => {
     it('should return addresses for a specific user', async () => {
       const user1 = await prisma.user.create({
-        data: { name: 'User 1', email: 'user1@example.com' }
+        data: { name: 'User 1', email: 'user1@example.com', password: 'pass1' }
       });
 
       const user2 = await prisma.user.create({
-        data: { name: 'User 2', email: 'user2@example.com' }
+        data: { name: 'User 2', email: 'user2@example.com', password: 'pass2' }
       });
 
       await request(app).post('/api/addresses').send({
@@ -227,7 +227,7 @@ describe('Address API Endpoints', () => {
   describe('PATCH /api/addresses/:id', () => {
     it('should update an address', async () => {
       const user = await prisma.user.create({
-        data: { name: 'John Doe', email: 'john@example.com', age: 30 }
+        data: { name: 'John Doe', email: 'john@example.com', password: 'password123', age: 30 }
       });
 
       const createResponse = await request(app)
@@ -283,7 +283,7 @@ describe('Address API Endpoints', () => {
   describe('DELETE /api/addresses/:id', () => {
     it('should delete an address', async () => {
       const user = await prisma.user.create({
-        data: { name: 'John Doe', email: 'john@example.com', age: 30 }
+        data: { name: 'John Doe', email: 'john@example.com', password: 'password123', age: 30 }
       });
 
       const createResponse = await request(app)

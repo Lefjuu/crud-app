@@ -20,6 +20,7 @@ export class UserService {
       data: {
         name: userData.name,
         email: userData.email,
+        password: userData.password || '',
         age: userData.age
       }
     });

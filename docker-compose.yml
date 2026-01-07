@@ -1,0 +1,38 @@
+version: "3.8"
+
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://user:password@db:5432/crud_db
+    depends_on:
+      - db
+    volumes:
+      - ./prisma/migrations:/app/prisma/migrations:ro
+    networks:
+      - crud-network
+    restart: unless-stopped
+
+  db:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=crud_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - crud-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+networks:
+  crud-network:
+    driver: bridge

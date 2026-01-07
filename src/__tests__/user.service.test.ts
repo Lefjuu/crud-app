@@ -21,6 +21,7 @@ describe('UserService', () => {
       const userData = {
         name: 'Test User',
         email: 'test@example.com',
+        password: 'password123',
         age: 25
       };
 
@@ -35,8 +36,8 @@ describe('UserService', () => {
 
   describe('getAllUsers', () => {
     it('should return all users', async () => {
-      await userService.createUser({ name: 'User 1', email: 'user1@example.com' });
-      await userService.createUser({ name: 'User 2', email: 'user2@example.com' });
+      await userService.createUser({ name: 'User 1', email: 'user1@example.com', password: 'pass1' });
+      await userService.createUser({ name: 'User 2', email: 'user2@example.com', password: 'pass2' });
 
       const users = await userService.getAllUsers();
 
@@ -53,7 +54,8 @@ describe('UserService', () => {
     it('should return user by id', async () => {
       const created = await userService.createUser({
         name: 'Test User',
-        email: 'test@example.com'
+        email: 'test@example.com',
+        password: 'password123'
       });
 
       const user = await userService.getUserById(created.id!);
@@ -74,6 +76,7 @@ describe('UserService', () => {
       const created = await userService.createUser({
         name: 'Original Name',
         email: 'original@example.com',
+        password: 'password123',
         age: 20
       });
 
@@ -98,7 +101,8 @@ describe('UserService', () => {
     it('should delete user', async () => {
       const created = await userService.createUser({
         name: 'Test User',
-        email: 'test@example.com'
+        email: 'test@example.com',
+        password: 'password123'
       });
 
       const deleted = await userService.deleteUser(created.id!);
@@ -118,7 +122,8 @@ describe('UserService', () => {
     it('should return user by email', async () => {
       await userService.createUser({
         name: 'Test User',
-        email: 'test@example.com'
+        email: 'test@example.com',
+        password: 'password123'
       });
 
       const user = await userService.getUserByEmail('test@example.com');
