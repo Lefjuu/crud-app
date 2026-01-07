@@ -1,3 +1,5 @@
+process.env.PORT = '3001';
+
 import request from 'supertest';
 import app from '../index';
 import { prisma } from '../lib/prisma';

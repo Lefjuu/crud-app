@@ -3,6 +3,7 @@ import swaggerUi from 'swagger-ui-express';
 import swaggerJsdoc from 'swagger-jsdoc';
 import { prisma } from './lib/prisma';
 import userRoutes from './routes/user.routes';
+import addressRoutes from './routes/address.routes';
 
 const app: Application = express();
 const PORT = process.env.PORT || 3000;
@@ -33,6 +34,10 @@ const swaggerOptions = {
       {
         name: 'Users',
         description: 'User management endpoints'
+      },
+      {
+        name: 'Addresses',
+        description: 'Address management endpoints'
       }
     ]
   },
@@ -48,12 +53,14 @@ app.get('/', (req: Request, res: Response) => {
     message: 'Welcome to CRUD API',
     documentation: '/api-docs',
     endpoints: {
-      users: '/api/users'
+      users: '/api/users',
+      addresses: '/api/addresses'
     }
   });
 });
 
 app.use('/api/users', userRoutes);
+app.use('/api/addresses', addressRoutes);
 
 // 404 handler
 app.use((req: Request, res: Response) => {
@@ -85,6 +92,9 @@ process.on('beforeExit', async () => {
   await prisma.$disconnect();
 });
 
-startServer();
+// Start server only if not in test environment
+if (process.env.NODE_ENV !== 'test') {
+  startServer();
+}
 
 export default app;

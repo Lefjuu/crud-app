@@ -17,6 +17,21 @@ model User {
   age        Int?
   createdAt  DateTime @default(now()) @map("created_at")
   updatedAt  DateTime @updatedAt @map("updated_at")
+  addresses  Address[]
 
   @@map("users")
+}
+
+model Address {
+  id         Int      @id @default(autoincrement())
+  street     String
+  city       String
+  zipCode    String
+  country    String
+  userId     Int      @map("user_id")
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  @@map("addresses")
 }

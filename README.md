@@ -70,13 +70,19 @@ Once the server is running, visit `http://localhost:3000/api-docs` for interacti
 
 ## 📋 API Endpoints
 
-| Method | Endpoint         | Description       |
-| ------ | ---------------- | ----------------- |
-| GET    | `/api/users`     | Get all users     |
-| GET    | `/api/users/:id` | Get user by ID    |
-| POST   | `/api/users`     | Create a new user |
-| PATCH  | `/api/users/:id` | Update user       |
-| DELETE | `/api/users/:id` | Delete user       |
+| Method | Endpoint                      | Description              |
+| ------ | ----------------------------- | ------------------------ |
+| GET    | `/api/users`                  | Get all users            |
+| GET    | `/api/users/:id`              | Get user by ID           |
+| POST   | `/api/users`                  | Create a new user        |
+| PATCH  | `/api/users/:id`              | Update user              |
+| DELETE | `/api/users/:id`              | Delete user              |
+| GET    | `/api/addresses`              | Get all addresses        |
+| GET    | `/api/addresses/:id`          | Get address by ID        |
+| GET    | `/api/addresses/user/:userId` | Get addresses by user ID |
+| POST   | `/api/addresses`              | Create a new address     |
+| PATCH  | `/api/addresses/:id`          | Update address           |
+| DELETE | `/api/addresses/:id`          | Delete address           |
 
 ### Example Requests
 
@@ -107,18 +113,23 @@ crud-app/
 │   └── migrations/
 ├── src/
 │   ├── controllers/
-│   │   └── user.controller.ts
+│   │   ├── user.controller.ts
+│   │   └── address.controller.ts
 │   ├── services/
-│   │   └── user.service.ts
+│   │   ├── user.service.ts
+│   │   └── address.service.ts
 │   ├── routes/
-│   │   └── user.routes.ts
+│   │   ├── user.routes.ts
+│   │   └── address.routes.ts
 │   ├── models/
 │   │   └── user.model.ts
 │   ├── lib/
 │   │   └── prisma.ts
 │   ├── __tests__/
 │   │   ├── user.test.ts
-│   │   └── user.service.test.ts
+│   │   ├── user.service.test.ts
+│   │   ├── address.test.ts
+│   │   └── address.service.test.ts
 │   └── index.ts
 ├── package.json
 ├── tsconfig.json
@@ -130,14 +141,29 @@ crud-app/
 
 ```prisma
 model User {
-  id         Int      @id @default(autoincrement())
+  id         Int       @id @default(autoincrement())
   name       String
-  email      String   @unique
+  email      String    @unique
   age        Int?
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @updatedAt @map("updated_at")
+  addresses  Address[]
+
+  @@map("users")
+}
+
+model Address {
+  id         Int      @id @default(autoincrement())
+  street     String
+  city       String
+  zipCode    String
+  country    String
+  userId     Int      @map("user_id")
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt  DateTime @default(now()) @map("created_at")
   updatedAt  DateTime @updatedAt @map("updated_at")
 
-  @@map("users")
+  @@map("addresses")
 }
 ```
 
