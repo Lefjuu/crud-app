@@ -90,7 +90,7 @@ const addressController = new AddressController();
  *                   type: integer
  *                   example: 2
  */
-router.get('/', (req, res) => addressController.getAllAddresses(req, res));
+router.get('/', authenticateToken, (req, res) => addressController.getAllAddresses(req, res));
 
 /**
  * @swagger
@@ -121,7 +121,7 @@ router.get('/', (req, res) => addressController.getAllAddresses(req, res));
  *                 data:
  *                   $ref: '#/components/schemas/Address'
  */
-router.get('/:id', (req, res) => addressController.getAddressById(req, res));
+router.get('/:id', authenticateToken, (req, res) => addressController.getAddressById(req, res));
 
 /**
  * @swagger
@@ -154,7 +154,7 @@ router.get('/:id', (req, res) => addressController.getAddressById(req, res));
  *                   items:
  *                     $ref: '#/components/schemas/Address'
  */
-router.get('/user/:userId', (req, res) => addressController.getAddressesByUserId(req, res));
+router.get('/user/:userId', authenticateToken, (req, res) => addressController.getAddressesByUserId(req, res));
 
 /**
  * @swagger
@@ -186,7 +186,7 @@ router.get('/user/:userId', (req, res) => addressController.getAddressesByUserId
  *                 data:
  *                   $ref: '#/components/schemas/Address'
  */
-router.post('/', (req, res) => addressController.createAddress(req, res));
+router.post('/', authenticateToken, (req, res) => addressController.createAddress(req, res));
 
 /**
  * @swagger
@@ -239,7 +239,7 @@ router.post('/', (req, res) => addressController.createAddress(req, res));
  *                 data:
  *                   $ref: '#/components/schemas/Address'
  */
-router.patch('/:id', (req, res) => addressController.updateAddress(req, res));
+router.patch('/:id', authenticateToken, (req, res) => addressController.updateAddress(req, res));
 
 /**
  * @swagger
@@ -271,6 +271,6 @@ router.patch('/:id', (req, res) => addressController.updateAddress(req, res));
  *                   type: string
  *                   example: Address deleted successfully
  */
-router.delete('/:id', (req, res) => addressController.deleteAddress(req, res));
+router.delete('/:id', authenticateToken, (req, res) => addressController.deleteAddress(req, res));
 
 export default router;

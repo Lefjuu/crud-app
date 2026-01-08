@@ -17,9 +17,34 @@ beforeEach(async () => {
   await prisma.user.deleteMany();
 });
 
+// Helper function to get auth token
+const getAuthToken = async () => {
+  const testUser = {
+    name: 'Test User',
+    email: 'test@example.com',
+    password: 'password123'
+  };
+
+  // Register user
+  await request(app)
+    .post('/api/auth/register')
+    .send(testUser);
+
+  // Login and get token
+  const loginResponse = await request(app)
+    .post('/api/auth/login')
+    .send({
+      email: testUser.email,
+      password: testUser.password
+    });
+
+  return loginResponse.body.data.token;
+};
+
 describe('Address API Endpoints', () => {
   describe('POST /api/addresses', () => {
     it('should create a new address', async () => {
+      const token = await getAuthToken();
       const user = await prisma.user.create({
         data: { name: 'John Doe', email: 'john@example.com', password: 'password123', age: 30 }
       });
@@ -34,6 +59,7 @@ describe('Address API Endpoints', () => {
 
       const response = await request(app)
         .post('/api/addresses')
+        .set('Authorization', `Bearer ${token}`)
         .send(newAddress)
         .expect(201);
 
@@ -46,6 +72,7 @@ describe('Address API Endpoints', () => {
     });
 
     it('should return 400 if required fields are missing', async () => {
+      const token = await getAuthToken();
       const invalidAddress = {
         street: '123 Main St'
         // missing city, zipCode, country, userId
@@ -53,6 +80,7 @@ describe('Address API Endpoints', () => {
 
       const response = await request(app)
         .post('/api/addresses')
+        .set('Authorization', `Bearer ${token}`)
         .send(invalidAddress)
         .expect(400);
 
@@ -61,6 +89,7 @@ describe('Address API Endpoints', () => {
     });
 
     it('should return 404 if user does not exist', async () => {
+      const token = await getAuthToken();
       const addressData = {
         street: '123 Main St',
         city: 'Test City',
@@ -71,6 +100,7 @@ describe('Address API Endpoints', () => {
 
       const response = await request(app)
         .post('/api/addresses')
+        .set('Authorization', `Bearer ${token}`)
         .send(addressData)
         .expect(404);
 
@@ -81,8 +111,10 @@ describe('Address API Endpoints', () => {
 
   describe('GET /api/addresses', () => {
     it('should return empty array when no addresses exist', async () => {
+      const token = await getAuthToken();
       const response = await request(app)
         .get('/api/addresses')
+        .set('Authorization', `Bearer ${token}`)
         .expect(200);
 
       expect(response.body.success).toBe(true);
@@ -91,11 +123,12 @@ describe('Address API Endpoints', () => {
     });
 
     it('should return all addresses with user data', async () => {
+      const token = await getAuthToken();
       const user = await prisma.user.create({
         data: { name: 'John Doe', email: 'john@example.com', password: 'password123', age: 30 }
       });
 
-      await request(app).post('/api/addresses').send({
+      await request(app).post('/api/addresses').set('Authorization', `Bearer ${token}`).send({
         street: '123 Main St',
         city: 'Test City',
         zipCode: '12345',
@@ -103,7 +136,7 @@ describe('Address API Endpoints', () => {
         userId: user.id
       });
 
-      await request(app).post('/api/addresses').send({
+      await request(app).post('/api/addresses').set('Authorization', `Bearer ${token}`).send({
         street: '456 Oak St',
         city: 'Another City',
         zipCode: '67890',
@@ -113,6 +146,7 @@ describe('Address API Endpoints', () => {
 
       const response = await request(app)
         .get('/api/addresses')
+        .set('Authorization', `Bearer ${token}`)
         .expect(200);
 
       expect(response.body.success).toBe(true);
@@ -125,12 +159,14 @@ describe('Address API Endpoints', () => {
 
   describe('GET /api/addresses/:id', () => {
     it('should return an address by id', async () => {
+      const token = await getAuthToken();
       const user = await prisma.user.create({
         data: { name: 'John Doe', email: 'john@example.com', password: 'password123', age: 30 }
       });
 
       const createResponse = await request(app)
         .post('/api/addresses')
+        .set('Authorization', `Bearer ${token}`)
         .send({
           street: '123 Main St',
           city: 'Test City',
@@ -143,6 +179,7 @@ describe('Address API Endpoints', () => {
 
       const response = await request(app)
         .get(`/api/addresses/${addressId}`)
+        .set('Authorization', `Bearer ${token}`)
         .expect(200);
 
       expect(response.body.success).toBe(true);
@@ -152,8 +189,10 @@ describe('Address API Endpoints', () => {
     });
 
     it('should return 404 if address not found', async () => {
+      const token = await getAuthToken();
       const response = await request(app)
         .get('/api/addresses/999')
+        .set('Authorization', `Bearer ${token}`)
         .expect(404);
 
       expect(response.body.success).toBe(false);
@@ -161,8 +200,10 @@ describe('Address API Endpoints', () => {
     });
 
     it('should return 400 for invalid id', async () => {
+      const token = await getAuthToken();
       const response = await request(app)
         .get('/api/addresses/invalid')
+        .set('Authorization', `Bearer ${token}`)
         .expect(400);
 
       expect(response.body.success).toBe(false);
@@ -172,6 +213,7 @@ describe('Address API Endpoints', () => {
 
   describe('GET /api/addresses/user/:userId', () => {
     it('should return addresses for a specific user', async () => {
+      const token = await getAuthToken();
       const user1 = await prisma.user.create({
         data: { name: 'User 1', email: 'user1@example.com', password: 'pass1' }
       });
@@ -180,7 +222,7 @@ describe('Address API Endpoints', () => {
         data: { name: 'User 2', email: 'user2@example.com', password: 'pass2' }
       });
 
-      await request(app).post('/api/addresses').send({
+      await request(app).post('/api/addresses').set('Authorization', `Bearer ${token}`).send({
         street: 'Address 1',
         city: 'City 1',
         zipCode: '11111',
@@ -188,7 +230,7 @@ describe('Address API Endpoints', () => {
         userId: user1.id
       });
 
-      await request(app).post('/api/addresses').send({
+      await request(app).post('/api/addresses').set('Authorization', `Bearer ${token}`).send({
         street: 'Address 2',
         city: 'City 2',
         zipCode: '22222',
@@ -196,7 +238,7 @@ describe('Address API Endpoints', () => {
         userId: user1.id
       });
 
-      await request(app).post('/api/addresses').send({
+      await request(app).post('/api/addresses').set('Authorization', `Bearer ${token}`).send({
         street: 'Address 3',
         city: 'City 3',
         zipCode: '33333',
@@ -206,6 +248,7 @@ describe('Address API Endpoints', () => {
 
       const response = await request(app)
         .get(`/api/addresses/user/${user1.id}`)
+        .set('Authorization', `Bearer ${token}`)
         .expect(200);
 
       expect(response.body.success).toBe(true);
@@ -215,8 +258,10 @@ describe('Address API Endpoints', () => {
     });
 
     it('should return 400 for invalid user id', async () => {
+      const token = await getAuthToken();
       const response = await request(app)
         .get('/api/addresses/user/invalid')
+        .set('Authorization', `Bearer ${token}`)
         .expect(400);
 
       expect(response.body.success).toBe(false);
@@ -226,12 +271,14 @@ describe('Address API Endpoints', () => {
 
   describe('PATCH /api/addresses/:id', () => {
     it('should update an address', async () => {
+      const token = await getAuthToken();
       const user = await prisma.user.create({
         data: { name: 'John Doe', email: 'john@example.com', password: 'password123', age: 30 }
       });
 
       const createResponse = await request(app)
         .post('/api/addresses')
+        .set('Authorization', `Bearer ${token}`)
         .send({
           street: '123 Main St',
           city: 'Test City',
@@ -249,6 +296,7 @@ describe('Address API Endpoints', () => {
 
       const response = await request(app)
         .patch(`/api/addresses/${addressId}`)
+        .set('Authorization', `Bearer ${token}`)
         .send(updateData)
         .expect(200);
 
@@ -260,8 +308,10 @@ describe('Address API Endpoints', () => {
     });
 
     it('should return 404 if address not found', async () => {
+      const token = await getAuthToken();
       const response = await request(app)
         .patch('/api/addresses/999')
+        .set('Authorization', `Bearer ${token}`)
         .send({ street: 'Test' })
         .expect(404);
 
@@ -270,8 +320,10 @@ describe('Address API Endpoints', () => {
     });
 
     it('should return 400 for invalid id', async () => {
+      const token = await getAuthToken();
       const response = await request(app)
         .patch('/api/addresses/invalid')
+        .set('Authorization', `Bearer ${token}`)
         .send({ street: 'Test' })
         .expect(400);
 
@@ -282,12 +334,14 @@ describe('Address API Endpoints', () => {
 
   describe('DELETE /api/addresses/:id', () => {
     it('should delete an address', async () => {
+      const token = await getAuthToken();
       const user = await prisma.user.create({
         data: { name: 'John Doe', email: 'john@example.com', password: 'password123', age: 30 }
       });
 
       const createResponse = await request(app)
         .post('/api/addresses')
+        .set('Authorization', `Bearer ${token}`)
         .send({
           street: '123 Main St',
           city: 'Test City',
@@ -300,6 +354,7 @@ describe('Address API Endpoints', () => {
 
       const response = await request(app)
         .delete(`/api/addresses/${addressId}`)
+        .set('Authorization', `Bearer ${token}`)
         .expect(200);
 
       expect(response.body.success).toBe(true);
@@ -308,12 +363,15 @@ describe('Address API Endpoints', () => {
       // Verify address is deleted
       await request(app)
         .get(`/api/addresses/${addressId}`)
+        .set('Authorization', `Bearer ${token}`)
         .expect(404);
     });
 
     it('should return 404 if address not found', async () => {
+      const token = await getAuthToken();
       const response = await request(app)
         .delete('/api/addresses/999')
+        .set('Authorization', `Bearer ${token}`)
         .expect(404);
 
       expect(response.body.success).toBe(false);
@@ -321,8 +379,10 @@ describe('Address API Endpoints', () => {
     });
 
     it('should return 400 for invalid id', async () => {
+      const token = await getAuthToken();
       const response = await request(app)
         .delete('/api/addresses/invalid')
+        .set('Authorization', `Bearer ${token}`)
         .expect(400);
 
       expect(response.body.success).toBe(false);

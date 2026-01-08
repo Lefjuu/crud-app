@@ -91,7 +91,7 @@ const userController = new UserController();
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.get('/', (req, res) => userController.getAllUsers(req, res));
+router.get('/', authenticateToken, (req, res) => userController.getAllUsers(req, res));
 
 /**
  * @swagger
@@ -140,7 +140,7 @@ router.get('/', (req, res) => userController.getAllUsers(req, res));
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.get('/:id', (req, res) => userController.getUserById(req, res));
+router.get('/:id', authenticateToken, (req, res) => userController.getUserById(req, res));
 
 /**
  * @swagger
@@ -190,7 +190,7 @@ router.get('/:id', (req, res) => userController.getUserById(req, res));
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.post('/', (req, res) => userController.createUser(req, res));
+router.post('/', authenticateToken, (req, res) => userController.createUser(req, res));
 
 /**
  * @swagger
@@ -265,7 +265,7 @@ router.post('/', (req, res) => userController.createUser(req, res));
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.patch('/:id', (req, res) => userController.updateUser(req, res));
+router.patch('/:id', authenticateToken, (req, res) => userController.updateUser(req, res));
 
 /**
  * @swagger
@@ -315,6 +315,6 @@ router.patch('/:id', (req, res) => userController.updateUser(req, res));
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.delete('/:id', (req, res) => userController.deleteUser(req, res));
+router.delete('/:id', authenticateToken, (req, res) => userController.deleteUser(req, res));
 
 export default router;

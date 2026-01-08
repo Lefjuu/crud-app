@@ -84,12 +84,14 @@ describe('User API Endpoints', () => {
     });
 
     it('should return 400 if email is missing', async () => {
+      const token = await getAuthToken();
       const invalidUser = {
         name: 'Jan Kowalski'
       };
 
       const response = await request(app)
         .post('/api/users')
+        .set('Authorization', `Bearer ${token}`)
         .send(invalidUser)
         .expect(400);
 
@@ -97,16 +99,18 @@ describe('User API Endpoints', () => {
     });
 
     it('should return 409 if email already exists', async () => {
+      const token = await getAuthToken();
       const user = {
         name: 'Jan Kowalski',
         email: 'jan@example.com',
         age: 25
       };
 
-      await request(app).post('/api/users').send(user);
+      await request(app).post('/api/users').set('Authorization', `Bearer ${token}`).send(user);
 
       const response = await request(app)
         .post('/api/users')
+        .set('Authorization', `Bearer ${token}`)
         .send(user)
         .expect(409);
 
@@ -117,8 +121,10 @@ describe('User API Endpoints', () => {
 
   describe('GET /api/users', () => {
     it('should return empty array when no users exist', async () => {
+      const token = await getAuthToken();
       const response = await request(app)
         .get('/api/users')
+        .set('Authorization', `Bearer ${token}`)
         .expect(200);
 
       expect(response.body.success).toBe(true);
@@ -127,17 +133,19 @@ describe('User API Endpoints', () => {
     });
 
     it('should return all users', async () => {
+      const token = await getAuthToken();
       const users = [
         { name: 'User 1', email: 'user1@example.com', age: 20 },
         { name: 'User 2', email: 'user2@example.com', age: 30 }
       ];
 
       for (const user of users) {
-        await request(app).post('/api/users').send(user);
+        await request(app).post('/api/users').set('Authorization', `Bearer ${token}`).send(user);
       }
 
       const response = await request(app)
         .get('/api/users')
+        .set('Authorization', `Bearer ${token}`)
         .expect(200);
 
       expect(response.body.success).toBe(true);
@@ -148,6 +156,7 @@ describe('User API Endpoints', () => {
 
   describe('GET /api/users/:id', () => {
     it('should return a user by id', async () => {
+      const token = await getAuthToken();
       const newUser = {
         name: 'Jan Kowalski',
         email: 'jan@example.com',
@@ -156,12 +165,14 @@ describe('User API Endpoints', () => {
 
       const createResponse = await request(app)
         .post('/api/users')
+        .set('Authorization', `Bearer ${token}`)
         .send(newUser);
 
       const userId = createResponse.body.data.id;
 
       const response = await request(app)
         .get(`/api/users/${userId}`)
+        .set('Authorization', `Bearer ${token}`)
         .expect(200);
 
       expect(response.body.success).toBe(true);
@@ -170,8 +181,10 @@ describe('User API Endpoints', () => {
     });
 
     it('should return 404 if user not found', async () => {
+      const token = await getAuthToken();
       const response = await request(app)
         .get('/api/users/999')
+        .set('Authorization', `Bearer ${token}`)
         .expect(404);
 
       expect(response.body.success).toBe(false);
@@ -179,8 +192,10 @@ describe('User API Endpoints', () => {
     });
 
     it('should return 400 for invalid id', async () => {
+      const token = await getAuthToken();
       const response = await request(app)
         .get('/api/users/invalid')
+        .set('Authorization', `Bearer ${token}`)
         .expect(400);
 
       expect(response.body.success).toBe(false);
@@ -190,6 +205,7 @@ describe('User API Endpoints', () => {
 
   describe('PATCH /api/users/:id', () => {
     it('should update a user', async () => {
+      const token = await getAuthToken();
       const newUser = {
         name: 'Jan Kowalski',
         email: 'jan@example.com',
@@ -198,6 +214,7 @@ describe('User API Endpoints', () => {
 
       const createResponse = await request(app)
         .post('/api/users')
+        .set('Authorization', `Bearer ${token}`)
         .send(newUser);
 
       const userId = createResponse.body.data.id;
@@ -209,6 +226,7 @@ describe('User API Endpoints', () => {
 
       const response = await request(app)
         .patch(`/api/users/${userId}`)
+        .set('Authorization', `Bearer ${token}`)
         .send(updateData)
         .expect(200);
 
@@ -220,8 +238,10 @@ describe('User API Endpoints', () => {
     });
 
     it('should return 404 if user not found', async () => {
+      const token = await getAuthToken();
       const response = await request(app)
         .patch('/api/users/999')
+        .set('Authorization', `Bearer ${token}`)
         .send({ name: 'Test' })
         .expect(404);
 
@@ -230,6 +250,7 @@ describe('User API Endpoints', () => {
     });
 
     it('should return 409 if email already exists', async () => {
+      const token = await getAuthToken();
       const user1 = {
         name: 'User 1',
         email: 'user1@example.com',
@@ -242,13 +263,14 @@ describe('User API Endpoints', () => {
         age: 30
       };
 
-      await request(app).post('/api/users').send(user1);
-      const createResponse = await request(app).post('/api/users').send(user2);
+      await request(app).post('/api/users').set('Authorization', `Bearer ${token}`).send(user1);
+      const createResponse = await request(app).post('/api/users').set('Authorization', `Bearer ${token}`).send(user2);
       
       const userId = createResponse.body.data.id;
 
       const response = await request(app)
         .patch(`/api/users/${userId}`)
+        .set('Authorization', `Bearer ${token}`)
         .send({ email: 'user1@example.com' })
         .expect(409);
 
@@ -259,6 +281,7 @@ describe('User API Endpoints', () => {
 
   describe('DELETE /api/users/:id', () => {
     it('should delete a user', async () => {
+      const token = await getAuthToken();
       const newUser = {
         name: 'Jan Kowalski',
         email: 'jan@example.com',
@@ -267,12 +290,14 @@ describe('User API Endpoints', () => {
 
       const createResponse = await request(app)
         .post('/api/users')
+        .set('Authorization', `Bearer ${token}`)
         .send(newUser);
 
       const userId = createResponse.body.data.id;
 
       const response = await request(app)
         .delete(`/api/users/${userId}`)
+        .set('Authorization', `Bearer ${token}`)
         .expect(200);
 
       expect(response.body.success).toBe(true);
@@ -281,12 +306,15 @@ describe('User API Endpoints', () => {
       // Verify user is deleted
       await request(app)
         .get(`/api/users/${userId}`)
+        .set('Authorization', `Bearer ${token}`)
         .expect(404);
     });
 
     it('should return 404 if user not found', async () => {
+      const token = await getAuthToken();
       const response = await request(app)
         .delete('/api/users/999')
+        .set('Authorization', `Bearer ${token}`)
         .expect(404);
 
       expect(response.body.success).toBe(false);
@@ -294,8 +322,10 @@ describe('User API Endpoints', () => {
     });
 
     it('should return 400 for invalid id', async () => {
+      const token = await getAuthToken();
       const response = await request(app)
         .delete('/api/users/invalid')
+        .set('Authorization', `Bearer ${token}`)
         .expect(400);
 
       expect(response.body.success).toBe(false);
